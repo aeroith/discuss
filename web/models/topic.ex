@@ -4,6 +4,7 @@ defmodule Discuss.Topic do
   # Define the schema in db so phoenix knows how to handle stuff
   schema "topics" do
     field :title, :string
+    belongs_to :user, Discuss.User
   end
 
   def changeset(struct, params \\ %{}) do
