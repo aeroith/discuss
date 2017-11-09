@@ -32,9 +32,13 @@ defmodule Discuss.TopicController do
   end
 
   def index(conn, _params) do
-    IO.inspect(conn.assigns)
     topics = Repo.all(Topic)
     render conn, "index.html", topics: topics
+  end
+
+  def show(conn, %{"id" => topic_id}) do
+    topic = Repo.get!(Topic, topic_id);
+    render conn, "show.html", topic: topic
   end
 
   def edit(conn, %{"id" => topic_id}) do
@@ -68,7 +72,7 @@ defmodule Discuss.TopicController do
     |> redirect(to: topic_path(conn, :index))
   end
 
-  def check_post_owner(conn, params) do
+  def check_post_owner(conn, _params) do
     %{params: %{"id" => topic_id}} = conn
     
     if Repo.get(Topic, topic_id).user_id == conn.assigns.user.id do
