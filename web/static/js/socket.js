@@ -3,9 +3,15 @@
 
 // To use Phoenix channels, the first step is to import Socket
 // and connect at the socket path in "lib/my_app/endpoint.ex":
-import { Socket } from "phoenix";
+import {
+  Socket
+} from "phoenix";
 
-let socket = new Socket("/socket", { params: { token: window.userToken } });
+let socket = new Socket("/socket", {
+  params: {
+    token: window.userToken
+  }
+});
 
 // When you connect, you'll often need to authenticate the client.
 // For example, imagine you have an authentication plug, `MyAuth`,
@@ -59,11 +65,47 @@ const createSocket = (topicId) => {
   channel
     .join()
     .receive("ok", resp => {
-      console.log("Joined successfully", resp);
+      console.log(resp)
+      renderComments(resp.comments);
     })
     .receive("error", resp => {
       console.log("Unable to join", resp);
     });
+
+  channel.on(`comments:${topicId}:new`, renderComment);
+
+  document.querySelector('button').addEventListener('click', () => {
+    const content = document.querySelector('textarea').value;
+    channel.push('comment:add', {
+      content
+    });
+  });
 };
+
+const renderCommentTemplate = comment => {
+  let email = 'Anonymous'
+  if (comment.user) {
+    email = comment.user.email;
+  }
+  return `<li class="collection-item">
+    ${comment.content}
+    <div class="secondary-content">
+      ${email}
+    </div>
+  </li>`;
+}
+
+const renderComments = (comments) => {
+  const renderedComments = comments.map(comment => {
+    return renderCommentTemplate(comment);
+  });
+
+  document.querySelector('.collection').innerHTML = renderedComments.join('');
+}
+
+
+const renderComment = (event) => {
+  document.querySelector('.collection').innerHTML += renderCommentTemplate(event.comment);
+}
 
 window.createSocket = createSocket;

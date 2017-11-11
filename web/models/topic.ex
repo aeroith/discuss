@@ -8,7 +8,7 @@ defmodule Discuss.Topic do
     has_many :comments, Discuss.Comment
   end
 
-  def changeset(struct, params \\ %{}) do
+  def changeset(struct, params \\ :empty) do
     struct
     |> cast(params, [:title])
     |> validate_required([:title])
